@@ -3,10 +3,9 @@
 # VERSION               0.0.1
 
 FROM ericvh/arm64-ubuntu-hpc
-MAINTAINER Eric Van Hensbergen <ericvh@gmail.com>
+MAINTAINER Eric Van Hensbergen <eric.vanhensbegren@arm.com>
 
 RUN mkdir /benchmarks
-ENV HOME /benchmarks
 
 # Marker Infrastructure
 
@@ -20,18 +19,26 @@ RUN make install
 WORKDIR /benchmarks
 RUN wget -qO- https://github.com/arm-hpc/CoMD/archive/master.tar.gz | tar xvzf - --transform 's/CoMD-master/CoMD/'
 WORKDIR /benchmarks/CoMD/src-openmp
-RUN ln -s Makefile.aarch64 Makefile
 RUN make -f Makefile.aarch64 -j4
-RUN make clean
-RUN make -f Makefile.aarch64 -j4
-WORKDIR /benchmarks/CoMD/src-openmp
+RUN make -f Makefile.aarch64 clean
+RUN make -f Makefile.aarch64.omp -j4
+WORKDIR /benchmarks/CoMD/src-mpi
+RUN make -f Makefile.aarch64 -j4 DO_MPI=OFF
+RUN make -f Makefile.aarch64 clean
+RUN make -f Makefile.aarch64 -j4 DO_MPI=ON
 
 # LULESH
 
 WORKDIR /benchmarks
 RUN wget -qO- https://github.com/arm-hpc/lulesh/archive/master.tar.gz | tar xvzf - --transform 's/LULESH-master/lulesh/'
 WORKDIR /benchmarks/lulesh
-RUN make -f Makefile.aarch64 -j4
+RUN make -f Makefile.aarch64.serial -j4
+RUN make -f Makefile.aarch64.serial -j4 lulesh2.0-serial-static
+RUN make -f Makefile.aarch64 tidy
+RUN make -f Makefile.aarch64.omp -j4
+RUN make -f Makefile.aarch64 tidy
+RUN make -f Makefile.aarch64.mpi -j4
+RUN make -f Makefile.aarch64 tidy
 RUN make -f Makefile.aarch64 -j4
 
 # miniAMR (no ARM optimizations yet)
@@ -86,4 +93,4 @@ RUN ./makenek.aarch64
 #RUN chmod ugo+x build-linux-aarch64.sh
 #RUN ./build-linux-aarch64.sh
 
-WORKDIR /benchmarks
+WORKDIR /
