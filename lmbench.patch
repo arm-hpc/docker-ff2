@@ -1,0 +1,63 @@
+diff -uP lmbench3/Makefile lmbench3-patched/Makefile
+--- lmbench3/Makefile	2005-08-22 19:19:55.000000000 -0500
++++ lmbench3-patched/Makefile	2015-02-17 11:20:12.000000000 -0600
+@@ -5,6 +5,7 @@
+ #
+ # build		(default) go to the source directory and build the benchmark
+ # results	go to the source directory and build and run the benchmark
++# config	configures run parameters
+ # rerun		run the benchmark again
+ # see		see the results that came with this release
+ #		Go to the results directory and read the Makefile.
+@@ -22,6 +23,9 @@
+ results: FRC
+ 	cd src && $(MAKE) results
+ 
++config:
++	cd src && $(MAKE) config
++
+ rerun: 
+ 	cd src && $(MAKE) rerun
+ 
+diff -uP lmbench3/Makefile.rej lmbench3-patched/Makefile.rej
+--- lmbench3/Makefile.rej	1969-12-31 18:00:00.000000000 -0600
++++ lmbench3-patched/Makefile.rej	2015-02-17 11:20:24.000000000 -0600
+@@ -0,0 +1,34 @@
++***************
++*** 5,10 ****
++  #
++  # build		(default) go to the source directory and build the benchmark
++  # results	go to the source directory and build and run the benchmark
++  # rerun		run the benchmark again
++  # see		see the results that came with this release
++  #		Go to the results directory and read the Makefile.
++--- 5,11 ----
++  #
++  # build		(default) go to the source directory and build the benchmark
++  # results	go to the source directory and build and run the benchmark
+++ # config	configures run parameters
++  # rerun		run the benchmark again
++  # see		see the results that came with this release
++  #		Go to the results directory and read the Makefile.
++***************
++*** 22,27 ****
++  results: FRC
++  	cd src && $(MAKE) results
++  
++  rerun: 
++  	cd src && $(MAKE) rerun
++  
++--- 23,31 ----
++  results: FRC
++  	cd src && $(MAKE) results
++  
+++ config:
+++ 	cd src && $(MAKE) config
+++ 
++  rerun: 
++  	cd src && $(MAKE) rerun
++  
+Common subdirectories: lmbench3/doc and lmbench3-patched/doc
+Common subdirectories: lmbench3/results and lmbench3-patched/results
+Common subdirectories: lmbench3/scripts and lmbench3-patched/scripts
+Common subdirectories: lmbench3/src and lmbench3-patched/src
