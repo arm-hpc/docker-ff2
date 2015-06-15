@@ -1,63 +1,77 @@
-diff -uP lmbench3/Makefile lmbench3-patched/Makefile
---- lmbench3/Makefile	2005-08-22 19:19:55.000000000 -0500
-+++ lmbench3-patched/Makefile	2015-02-17 11:20:12.000000000 -0600
-@@ -5,6 +5,7 @@
+diff -uP lmbench3/src/Makefile lmbench3-patched/src/Makefile
+--- lmbench3/src/Makefile	2005-08-22 19:19:54.000000000 -0500
++++ lmbench3-patched/src/Makefile	2015-02-17 11:20:24.000000000 -0600
+@@ -4,6 +4,7 @@
  #
- # build		(default) go to the source directory and build the benchmark
- # results	go to the source directory and build and run the benchmark
+ # lmbench	[default] builds the benchmark suite for the current os/arch
+ # results	builds, configures run parameters, and runs the benchmark
 +# config	configures run parameters
- # rerun		run the benchmark again
- # see		see the results that came with this release
- #		Go to the results directory and read the Makefile.
-@@ -22,6 +23,9 @@
- results: FRC
- 	cd src && $(MAKE) results
+ # rerun		reruns the benchmark using the same parameters as last time
+ # scaling	reruns the benchmark using same parameters as last time,
+ #		except it asks what scaling value to use
+@@ -118,8 +119,10 @@
+ 	@env OS="${OS}" ../scripts/config-run
+ 	@env OS="${OS}" ../scripts/results
  
-+config:
-+	cd src && $(MAKE) config
+-rerun: lmbench
++config: lmbench
+ 	@if [ ! -f $(CONFIG) ]; then env OS="${OS}" ../scripts/config-run; fi
 +
- rerun: 
- 	cd src && $(MAKE) rerun
++rerun: lmbench config
+ 	@env OS="${OS}" ../scripts/results
  
-diff -uP lmbench3/Makefile.rej lmbench3-patched/Makefile.rej
---- lmbench3/Makefile.rej	1969-12-31 18:00:00.000000000 -0600
-+++ lmbench3-patched/Makefile.rej	2015-02-17 11:20:24.000000000 -0600
-@@ -0,0 +1,34 @@
-+***************
-+*** 5,10 ****
-+  #
-+  # build		(default) go to the source directory and build the benchmark
-+  # results	go to the source directory and build and run the benchmark
-+  # rerun		run the benchmark again
-+  # see		see the results that came with this release
-+  #		Go to the results directory and read the Makefile.
-+--- 5,11 ----
-+  #
-+  # build		(default) go to the source directory and build the benchmark
-+  # results	go to the source directory and build and run the benchmark
-++ # config	configures run parameters
-+  # rerun		run the benchmark again
-+  # see		see the results that came with this release
-+  #		Go to the results directory and read the Makefile.
-+***************
-+*** 22,27 ****
-+  results: FRC
-+  	cd src && $(MAKE) results
-+  
-+  rerun: 
-+  	cd src && $(MAKE) rerun
-+  
-+--- 23,31 ----
-+  results: FRC
-+  	cd src && $(MAKE) results
-+  
-++ config:
-++ 	cd src && $(MAKE) config
-++ 
-+  rerun: 
-+  	cd src && $(MAKE) rerun
-+  
-Common subdirectories: lmbench3/doc and lmbench3-patched/doc
-Common subdirectories: lmbench3/results and lmbench3-patched/results
-Common subdirectories: lmbench3/scripts and lmbench3-patched/scripts
-Common subdirectories: lmbench3/src and lmbench3-patched/src
+ scaling: lmbench
+@@ -165,41 +168,6 @@
+ assembler:
+ 	@env CFLAGS=-O MAKE="$(MAKE)" MAKEFLAGS="$(MAKEFLAGS)" CC="${CC}" OS="${OS}" ../scripts/build asm
+ 
+-bk.ver: ../SCCS/s.ChangeSet
+-	rm -f bk.ver
+-	-echo `bk prs -hr+ -d'$$if(:SYMBOL:){:SYMBOL: }:UTC:' ../ChangeSet;` > bk.ver
+-	touch bk.ver
+-
+-dist: bk.ver
+-	@if [ "X`cd ..; bk sfiles -c`" != "X" ]; then \
+-		echo "modified files!"; \
+-		false; \
+-	 fi
+-	@if [ "X`cd ..; bk pending`" != "X" ]; then \
+-		echo "pending changes!"; \
+-		false; \
+-	 fi
+-	cd ..; \
+-		SRCDIR=`pwd`; \
+-		DIR=`basename $${SRCDIR}`; \
+-		VERSION=`cat src/bk.ver| awk '{print $$1;}' | sed -e 's/Version-//g'`; \
+-		cd ..; \
+-		bk clone $${DIR} /tmp/lmbench-$${VERSION}; \
+-		cd /tmp/lmbench-$${VERSION}; \
+-		bk sfiles | xargs touch; \
+-		sleep 5; \
+-		bk get -s; \
+-		for d in doc results scripts src; do \
+-			cd $$d; bk get -s; cd ..; \
+-		done; \
+-		bk sfiles -U -g | xargs touch; \
+-		cd src; \
+-		make bk.ver; \
+-		cd /tmp; \
+-		tar czf $${SRCDIR}/../lmbench-$${VERSION}.tgz \
+-			lmbench-$${VERSION}; \
+-		rm -rf /tmp/lmbench-$${VERSION};
+-
+ get $(SRCS):
+ 	-get -s $(SRCS)
+ 
+@@ -228,9 +196,9 @@
+ 	install install-target dist get edit get-e clean clobber \
+ 	share depend testmake
+ 
+-$O/lmbench : ../scripts/lmbench bk.ver
++$O/lmbench : ../scripts/lmbench
+ 	rm -f $O/lmbench
+-	sed -e "s/<version>/`cat bk.ver`/g" < ../scripts/lmbench > $O/lmbench
++	sed -e "s/<version>/666/g" < ../scripts/lmbench > $O/lmbench
+ 	chmod +x $O/lmbench
+ 
+ $O/lmbench.a: $(LIBOBJS)

@@ -14,6 +14,14 @@ RUN wget -qO- https://github.com/arm-hpc/marker/archive/master.tar.gz | tar xvzf
 WORKDIR /benchmarks/marker
 RUN make install
 
+# LMbench
+WORKDIR /benchmarks
+RUN wget -qO- http://www.bitmover.com/lmbench/lmbench3.tar.gz | tar xvzf - 
+WORKDIR /benchmarks/lmbench3
+ADD lmbench.patch /tmp/lmbench.patch
+RUN patch -p1 < /tmp/lmbench.patch
+RUN make -j4 build
+
 # CoMD
 
 WORKDIR /benchmarks
@@ -79,18 +87,16 @@ WORKDIR /benchmarks/nekbone/test/example1
 RUN ./makenek.aarch64
 
 # SNAP
-# [TODO: fix broken link]
-#WORKDIR /benchmarks
-#RUN wget -qO- https://github.com/arm-hpc/SNAP/archive/master.tar.gz | tar xvzf - --transform 's/SNAP-master/SNAP/'
-#WORKDIR /benchmarks/SNAP/src
-#RUN make -j4
+WORKDIR /benchmarks
+RUN wget -qO- https://github.com/arm-hpc/SNAP/archive/master.tar.gz | tar xvzf - --transform 's/SNAP-master/SNAP/'
+WORKDIR /benchmarks/SNAP/src
+RUN make -j4
 
 # mcb
-#[TODO: fix boost dependencies]
-#WORKDIR /benchmarks
-#RUN wget -qO- https://github.com/arm-hpc/mcb/archive/master.tar.gz | tar xvzf - --transform 's/mcb-master/mcb/'
-#WORKDIR /benchmarks/mcb
-#RUN chmod ugo+x build-linux-aarch64.sh
-#RUN ./build-linux-aarch64.sh
+WORKDIR /benchmarks
+RUN wget -qO- https://github.com/arm-hpc/mcb/archive/master.tar.gz | tar xvzf - --transform 's/mcb-master/mcb/'
+WORKDIR /benchmarks/mcb
+RUN chmod ugo+x build-linux-aarch64.sh
+RUN ./build-linux-aarch64.sh
 
 WORKDIR /
