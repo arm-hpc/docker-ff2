@@ -2,7 +2,7 @@
 #
 # VERSION               0.0.1
 
-FROM ericvh/arm64-ubuntu-hpc
+FROM ericvh/arm64-ubuntu-hpc:15.04-gcc5
 MAINTAINER Eric Van Hensbergen <eric.vanhensbegren@arm.com>
 
 RUN mkdir /benchmarks
